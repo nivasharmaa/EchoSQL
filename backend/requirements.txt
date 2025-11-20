@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+duckdb
+sqlglot
+requests
+pydantic
+python-dotenv
