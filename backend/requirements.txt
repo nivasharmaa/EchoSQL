@@ -5,3 +5,5 @@ sqlglot
 requests
 pydantic
 python-dotenv
+openai>=1.40.0
+
