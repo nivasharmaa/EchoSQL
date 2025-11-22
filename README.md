@@ -1,4 +1,4 @@
-# EchoSQL (Prototype)
+# EchoSQL
 
 This project is a working prototype that converts natural language questions into SQL and executes the generated SQL on a demo database. The system includes a FastAPI backend, a Next.js frontend, and an LLM-powered SQL generation layer using the OpenAI API. The goal of this prototype is to demonstrate an end-to-end workflow for natural language → SQL → query results.
 
