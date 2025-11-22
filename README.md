@@ -1,74 +1,85 @@
 # EchoSQL (Prototype)
 
-Explain-Any-SQL is a full-stack prototype that translates natural language questions into SQL, executes the generated query on a live database, and returns the results through a clean web interface. The project demonstrates end-to-end integration across backend APIs, database execution, and an LLM-based SQL generation layer.
-
-This prototype is built with FastAPI, Next.js, DuckDB (with Postgres/RDS support), and the OpenAI API.
+This project is a working prototype that converts natural language questions into SQL and executes the generated SQL on a demo database. The system includes a FastAPI backend, a Next.js frontend, and an LLM-powered SQL generation layer using the OpenAI API. The goal of this prototype is to demonstrate an end-to-end workflow for natural language → SQL → query results.
 
 ---
 
-## Overview
+## Features Implemented
 
-The system allows users to enter natural language questions such as:
+* Natural language to SQL generation using the OpenAI GPT-4.1-mini API
+* SQL cleaning and validation (SELECT-only)
+* Execution of SQL queries against a local DuckDB database
+* Pre-seeded demo tables (`customers`, `orders`) for predictable outputs
+* FastAPI backend with three endpoints:
 
-“List all customers who have placed more than 3 orders.”
+  * `/api/sql/generate`
+  * `/api/run-sql`
+  * `/api/schema`
+* Next.js frontend to:
 
-The backend generates SQL based on the question and the known database schema. It then safely executes the SQL against a demo database and returns the results to the frontend.
+  * Enter a question
+  * View generated SQL
+  * Execute SQL
+  * Display query results in a table
+  * Show loading states and error messages
 
-The workflow:
-
-1. Natural language input
-2. SQL generation (LLM)
-3. Validation (SELECT-only)
-4. Database execution
-5. Display results in the UI
-
----
-
-## Features
-
-* Natural language to SQL translation using GPT-4.1-mini
-* SQL validation to prevent non-SELECT operations
-* Real query execution using DuckDB (default)
-* Optional Postgres/AWS RDS support via a single environment variable
-* FastAPI backend with typed request/response models
-* Next.js frontend with loading states, error handling, and table rendering
-* Schema-aware SQL generation using a DDL view of the database
+Everything shown in this README is built and functioning in the final prototype.
 
 ---
 
-## Tech Stack
+## Tech Stack Used
 
-**Backend:** FastAPI, Python, DuckDB, Pydantic, OpenAI API
-**Frontend:** Next.js 14 (App Router), React, TypeScript, Tailwind
-**Database:** DuckDB (demo), Postgres/RDS compatible
+**Backend:**
+
+* Python
+* FastAPI
+* DuckDB
+* Pydantic
+* Uvicorn
+
+**Frontend:**
+
+* Next.js (App Router)
+* React
+* TypeScript
+* TailwindCSS
+
+**AI:**
+
+* OpenAI GPT-4.1-mini (Chat Completions)
 
 ---
 
-## Project Structure
+## Project Structure (Actual)
 
 ```
-explain-any-sql/
-│
-├── backend/
-│   ├── app/
-│   │   ├── main.py
-│   │   ├── routes/
-│   │   ├── services/
-│   │   ├── models/
-│   │   └── utils/
-│   └── requirements.txt
-│
-└── frontend/
-    ├── app/
-    ├── public/
-    └── package.json
+backend/
+  app/
+    main.py
+    routes/
+      generate_sql.py
+      run_sql.py
+      schema.py
+    services/
+      llm_service.py
+      db_service.py
+    models/
+      request_models.py
+      response_models.py
+    utils/
+      schema_loader.py
+  requirements.txt
+
+frontend/
+  app/
+    page.tsx
+  package.json
+  tailwind.config.js
 ```
 
 ---
 
-## How to Run
-
-### Backend
+## Running the Backend
 
 ```
 cd backend
@@ -76,7 +87,21 @@ pip install -r requirements.txt
 uvicorn app.main:app --reload --port 8000 --app-dir backend
 ```
 
-### Frontend
+### Backend Environment Variables
+
+Create a `.env` file inside `backend`:
+
+```
+OPENAI_API_KEY=your_key_here
+DB_PATH=demo.db
+```
+
+DuckDB is used automatically.
+A demo database is created and seeded on startup.
+
+---
+
+## Running the Frontend
 
 ```
 cd frontend
@@ -84,55 +109,21 @@ npm install
 npm run dev
 ```
 
-Open: [http://localhost:3000](http://localhost:3000)
-
----
-
-## Environment Variables
-
-Create a `.env` file in the `backend` directory:
+Open the app at:
 
 ```
-OPENAI_API_KEY=your_key_here
-DB_PATH=demo.db
-DATABASE_URL=postgresql://user:password@host:5432/dbname   # optional
+http://localhost:3000
 ```
 
-If `DATABASE_URL` is set, the backend will use Postgres/RDS.
-If not, it defaults to a local DuckDB database with seeded demo data.
-
 ---
 
-## Demo Queries (Examples)
+## What This Prototype Demonstrates
 
-The following queries work well with the seeded demo database:
+* LLM prompting and SQL generation
+* Backend–frontend integration
+* Database querying and safe execution
+* Modern full-stack structure (FastAPI + Next.js)
+* Real working NL → SQL → results pipeline
 
-* “How many customers are in the database?”
-* “Show all orders with a total amount greater than 100.”
-* “List each customer with their total order amount.”
-* “List all customers who have placed more than 3 orders.”
-
----
-
-## Database
-
-By default, the system uses DuckDB and automatically initializes:
-
-Tables:
-
-* `customers`
-* `orders`
-
-It also seeds sample rows for testing and demonstrations.
-
-To switch to Postgres or AWS RDS, set `DATABASE_URL` and restart the backend.
-
----
-
-## Notes
-
-This prototype is intended for demonstration purposes.
-The design emphasizes correctness, clarity, and portability between different database engines.
-The architecture supports further extension, including schema ingestion, query explanations, authentication, and production database connections.
 
 
