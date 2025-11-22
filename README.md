@@ -4,6 +4,11 @@ This project is a working prototype that converts natural language questions int
 
 ---
 
+## 📹 Demo Video
+Watch the walkthrough here: https://drive.google.com/file/d/13o7EDJCYjVDZC74IIQJ7qKOakiMReH3i/view?usp=sharing
+
+---
+
 ## Features Implemented
 
 * Natural language to SQL generation using the OpenAI GPT-4.1-mini API
