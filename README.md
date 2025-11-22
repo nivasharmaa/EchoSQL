@@ -130,5 +130,11 @@ http://localhost:3000
 * Modern full-stack structure (FastAPI + Next.js)
 * Real working NL → SQL → results pipeline
 
+---
 
+## Upcoming Enhancements
+
+* AWS RDS PostgreSQL support for production-grade, cloud-hosted database execution
+* Environment-aware routing between local DuckDB and RDS
+* Improved schema sync and validation for enterprise deployments
 
