@@ -5,7 +5,7 @@ This project is a working prototype that converts natural language questions int
 ---
 
 ## Demo Video
-Watch the walkthrough here: https://drive.google.com/file/d/13o7EDJCYjVDZC74IIQJ7qKOakiMReH3i/view?usp=sharing
+Watch the walkthrough here: https://drive.google.com/file/d/1ycoJumhvpzDR8ouE5WyBuU66PH5Qd83i/view?usp=sharing
 
 ---
 
