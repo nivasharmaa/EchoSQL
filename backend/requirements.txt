@@ -6,4 +6,4 @@ requests
 pydantic
 python-dotenv
 openai>=1.40.0
-
+psycopg2-binary
