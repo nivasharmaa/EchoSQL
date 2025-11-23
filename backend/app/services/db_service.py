@@ -2,102 +2,60 @@ import os
 from typing import List, Tuple, Any
 
 import duckdb
+import psycopg2
+from psycopg2.extras import RealDictCursor
+from dotenv import load_dotenv
 
-# Use a local DuckDB file; you can change the path if you want
-DB_PATH = os.getenv("DB_PATH", "demo.db")
+load_dotenv()
 
-
-def get_connection() -> duckdb.DuckDBPyConnection:
-    """
-    Return a DuckDB connection to the local demo database file.
-    """
-    return duckdb.connect(DB_PATH)
+DATABASE_URL = os.getenv("DATABASE_URL")
+DUCKDB_PATH = os.getenv("DUCKDB_PATH", "demo.db")
 
 
-def init_demo_db() -> None:
-    """
-    Create demo tables + seed some data if they don't exist / are empty.
-    This is just for the MVP demo.
-    """
-    conn = get_connection()
+def _run_postgres(sql: str) -> Tuple[List[str], List[List[Any]]]:
+    if not DATABASE_URL:
+        raise RuntimeError("DATABASE_URL is not set but Postgres was selected")
+
+    # psycopg2 expects separate params, not a URL; we’ll parse manually if needed.
+    # For a standard URL like postgresql://user:pass@host:5432/dbname, psycopg2
+    # can accept it directly via "dsn" parameter.
+    conn = psycopg2.connect(DATABASE_URL)
     try:
-        # Customers table
-        conn.execute(
-            """
-            CREATE TABLE IF NOT EXISTS customers (
-                id          INTEGER,
-                name        TEXT,
-                email       TEXT,
-                created_at  TIMESTAMP
-            );
-            """
-        )
-
-        # Orders table
-        conn.execute(
-            """
-            CREATE TABLE IF NOT EXISTS orders (
-                id           INTEGER,
-                customer_id  INTEGER,
-                total_amount DOUBLE,
-                created_at   TIMESTAMP
-            );
-            """
-        )
-
-        # Seed data only if empty
-        customers_count = conn.execute("SELECT COUNT(*) FROM customers;").fetchone()[0]
-        orders_count = conn.execute("SELECT COUNT(*) FROM orders;").fetchone()[0]
-
-        if customers_count == 0 and orders_count == 0:
-            conn.execute(
-                """
-                INSERT INTO customers (id, name, email, created_at) VALUES
-                    (1, 'Alice',   'alice@example.com',   '2024-01-01'),
-                    (2, 'Bob',     'bob@example.com',     '2024-02-01'),
-                    (3, 'Charlie', 'charlie@example.com', '2024-03-01'),
-                    (4, 'Diana',   'diana@example.com',   '2024-04-01');
-                """
-            )
-
-            # Make sure at least one customer has > 3 orders for your demo query
-            conn.execute(
-                """
-                INSERT INTO orders (id, customer_id, total_amount, created_at) VALUES
-                    (101, 1, 120.50, '2024-05-01'),
-                    (102, 1,  80.00, '2024-05-10'),
-                    (103, 1, 200.00, '2024-05-15'),
-                    (104, 1,  50.00, '2024-05-20'),
-                    (201, 2,  75.00, '2024-06-01'),
-                    (202, 2,  40.00, '2024-06-05'),
-                    (301, 3, 300.00, '2024-07-01');
-                """
-            )
+        with conn.cursor() as cur:
+            cur.execute(sql)
+            rows = cur.fetchall()
+            columns = [desc[0] for desc in cur.description]
     finally:
         conn.close()
 
+    return columns, rows
 
-def run_select(sql: str) -> Tuple[List[str], List[List[Any]]]:
-    """
-    Run a SELECT-only query against the demo DB and return (columns, rows).
 
-    - Raises ValueError if the query is not a SELECT.
-    """
-    normalized = sql.strip().lower()
-    if not normalized.startswith("select"):
-        raise ValueError("Only SELECT queries are allowed in this demo.")
-
-    conn = get_connection()
+def _run_duckdb(sql: str) -> Tuple[List[str], List[List[Any]]]:
+    conn = duckdb.connect(DUCKDB_PATH)
     try:
         result = conn.execute(sql)
-        # DuckDB cursor-style description: list of (name, type, ...)
-        description = result.description
-        columns = [col[0] for col in description]
-        rows = result.fetchall()  # List[List[Any]]
-        return columns, rows
+        rows = result.fetchall()
+        columns = [col[0] for col in result.description]
     finally:
         conn.close()
 
+    return columns, rows
 
-# Initialize demo DB on import
-init_demo_db()
+
+def run_query(sql: str) -> Tuple[List[str], List[List[Any]]]:
+    """
+    Main entry point used by the FastAPI route.
+
+    If DATABASE_URL is set, use Postgres on AWS RDS.
+    Otherwise, fall back to local DuckDB.
+    """
+    # Optional safety: only allow SELECT
+    stripped = sql.strip().lower()
+    if not stripped.startswith("select"):
+        raise ValueError("Only SELECT queries are allowed in this demo")
+
+    if DATABASE_URL:
+        return _run_postgres(sql)
+    else:
+        return _run_duckdb(sql)
