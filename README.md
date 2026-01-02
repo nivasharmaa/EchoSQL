@@ -2,12 +2,10 @@
 
 This project is a working prototype that converts natural language questions into SQL and executes the generated SQL on a demo database. The system includes a FastAPI backend, a Next.js frontend, and an LLM-powered SQL generation layer using the OpenAI API. The goal of this prototype is to demonstrate an end-to-end workflow for natural language → SQL → query results.
 
----
 
 ## Demo Video
 Watch the walkthrough here: https://drive.google.com/file/d/1ycoJumhvpzDR8ouE5WyBuU66PH5Qd83i/view?usp=sharing
 
----
 
 ## Features Implemented
 
@@ -28,7 +26,6 @@ Watch the walkthrough here: https://drive.google.com/file/d/1ycoJumhvpzDR8ouE5Wy
 
 Everything shown in this README is built and functioning in the final prototype, with optional support for running queries against a cloud-hosted PostgreSQL database on AWS RDS.
 
----
 
 ## Tech Stack Used
 
@@ -51,8 +48,6 @@ Everything shown in this README is built and functioning in the final prototype,
 **AI:**
 
 * OpenAI GPT-4.1-mini (Chat Completions)
-
----
 
 ## Project Structure (Actual)
 
@@ -81,8 +76,6 @@ frontend/
   tailwind.config.js
 ```
 
----
-
 ## Running the Backend
 
 ```
@@ -108,7 +101,6 @@ DATABASE_URL=postgresql://<user>:<password>@<endpoint>:5432/postgres
 DuckDB is used automatically.
 A demo database is created and seeded on startup.
 
----
 
 ## Running the Frontend
 
@@ -124,7 +116,6 @@ Open the app at:
 http://localhost:3000
 ```
 
----
 
 ## What This Prototype Demonstrates
 
